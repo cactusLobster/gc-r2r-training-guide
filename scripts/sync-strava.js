@@ -137,6 +137,15 @@ async function main() {
     tripStart: ymd(TRIP),
     weeks
   };
+  if (fs.existsSync(OUT)) {
+    const prev = readJson(OUT);
+    const a = { ...prev }; delete a.generatedAt;
+    const b = { ...out }; delete b.generatedAt;
+    if (JSON.stringify(a) === JSON.stringify(b)) {
+      console.log(`No Strava data changes from ${activities.length} activities`);
+      return;
+    }
+  }
   writeJson(OUT, out);
   console.log(`Wrote ${OUT} from ${activities.length} Strava activities`);
 }
