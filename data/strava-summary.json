@@ -1,0 +1,366 @@
+{
+  "generatedAt": "2026-07-17T21:17:22.244Z",
+  "source": "strava",
+  "publicNote": "Sanitized weekly aggregates only. No Strava tokens or GPS routes are published.",
+  "trainingStart": "2026-07-17",
+  "tripStart": "2026-10-15",
+  "weeks": [
+    {
+      "week": 1,
+      "start": "2026-07-17",
+      "end": "2026-07-23",
+      "planned": {
+        "cardioDays": 4,
+        "hikeMiles": 5,
+        "verticalFt": 500,
+        "note": ""
+      },
+      "actual": {
+        "cardioDays": 0,
+        "cardioMinutes": 0,
+        "footMiles": 0,
+        "verticalFt": 0,
+        "stairMinutes": 0,
+        "rideMinutes": 0,
+        "crossTrainingMinutes": 0,
+        "longestFootMiles": 0,
+        "activityCount": 0
+      },
+      "flags": [
+        "low_cardio_days",
+        "low_hiking_specific_volume",
+        "low_vertical"
+      ]
+    },
+    {
+      "week": 2,
+      "start": "2026-07-24",
+      "end": "2026-07-30",
+      "planned": {
+        "cardioDays": 4,
+        "hikeMiles": 6,
+        "verticalFt": 700,
+        "note": ""
+      },
+      "actual": {
+        "cardioDays": 0,
+        "cardioMinutes": 0,
+        "footMiles": 0,
+        "verticalFt": 0,
+        "stairMinutes": 0,
+        "rideMinutes": 0,
+        "crossTrainingMinutes": 0,
+        "longestFootMiles": 0,
+        "activityCount": 0
+      },
+      "flags": [
+        "low_cardio_days",
+        "low_hiking_specific_volume",
+        "low_vertical"
+      ]
+    },
+    {
+      "week": 3,
+      "start": "2026-07-31",
+      "end": "2026-08-06",
+      "planned": {
+        "cardioDays": 4,
+        "hikeMiles": 7,
+        "verticalFt": 900,
+        "note": ""
+      },
+      "actual": {
+        "cardioDays": 0,
+        "cardioMinutes": 0,
+        "footMiles": 0,
+        "verticalFt": 0,
+        "stairMinutes": 0,
+        "rideMinutes": 0,
+        "crossTrainingMinutes": 0,
+        "longestFootMiles": 0,
+        "activityCount": 0
+      },
+      "flags": [
+        "low_cardio_days",
+        "low_hiking_specific_volume",
+        "low_vertical",
+        "long_hike_not_met"
+      ]
+    },
+    {
+      "week": 4,
+      "start": "2026-08-07",
+      "end": "2026-08-13",
+      "planned": {
+        "cardioDays": 4,
+        "hikeMiles": 6,
+        "verticalFt": 700,
+        "note": ""
+      },
+      "actual": {
+        "cardioDays": 0,
+        "cardioMinutes": 0,
+        "footMiles": 0,
+        "verticalFt": 0,
+        "stairMinutes": 0,
+        "rideMinutes": 0,
+        "crossTrainingMinutes": 0,
+        "longestFootMiles": 0,
+        "activityCount": 0
+      },
+      "flags": [
+        "low_cardio_days",
+        "low_hiking_specific_volume",
+        "low_vertical",
+        "long_hike_not_met"
+      ]
+    },
+    {
+      "week": 5,
+      "start": "2026-08-14",
+      "end": "2026-08-20",
+      "planned": {
+        "cardioDays": 4,
+        "hikeMiles": 8,
+        "verticalFt": 1200,
+        "note": ""
+      },
+      "actual": {
+        "cardioDays": 0,
+        "cardioMinutes": 0,
+        "footMiles": 0,
+        "verticalFt": 0,
+        "stairMinutes": 0,
+        "rideMinutes": 0,
+        "crossTrainingMinutes": 0,
+        "longestFootMiles": 0,
+        "activityCount": 0
+      },
+      "flags": [
+        "low_cardio_days",
+        "low_hiking_specific_volume",
+        "low_vertical",
+        "long_hike_not_met"
+      ]
+    },
+    {
+      "week": 6,
+      "start": "2026-08-21",
+      "end": "2026-08-27",
+      "planned": {
+        "cardioDays": 4,
+        "hikeMiles": 9,
+        "verticalFt": 1500,
+        "note": ""
+      },
+      "actual": {
+        "cardioDays": 0,
+        "cardioMinutes": 0,
+        "footMiles": 0,
+        "verticalFt": 0,
+        "stairMinutes": 0,
+        "rideMinutes": 0,
+        "crossTrainingMinutes": 0,
+        "longestFootMiles": 0,
+        "activityCount": 0
+      },
+      "flags": [
+        "low_cardio_days",
+        "low_hiking_specific_volume",
+        "low_vertical",
+        "long_hike_not_met"
+      ]
+    },
+    {
+      "week": 7,
+      "start": "2026-08-28",
+      "end": "2026-09-03",
+      "planned": {
+        "cardioDays": 4,
+        "hikeMiles": 10,
+        "verticalFt": 1800,
+        "note": ""
+      },
+      "actual": {
+        "cardioDays": 0,
+        "cardioMinutes": 0,
+        "footMiles": 0,
+        "verticalFt": 0,
+        "stairMinutes": 0,
+        "rideMinutes": 0,
+        "crossTrainingMinutes": 0,
+        "longestFootMiles": 0,
+        "activityCount": 0
+      },
+      "flags": [
+        "low_cardio_days",
+        "low_hiking_specific_volume",
+        "low_vertical",
+        "long_hike_not_met"
+      ]
+    },
+    {
+      "week": 8,
+      "start": "2026-09-04",
+      "end": "2026-09-10",
+      "planned": {
+        "cardioDays": 4,
+        "hikeMiles": 7,
+        "verticalFt": 900,
+        "note": ""
+      },
+      "actual": {
+        "cardioDays": 0,
+        "cardioMinutes": 0,
+        "footMiles": 0,
+        "verticalFt": 0,
+        "stairMinutes": 0,
+        "rideMinutes": 0,
+        "crossTrainingMinutes": 0,
+        "longestFootMiles": 0,
+        "activityCount": 0
+      },
+      "flags": [
+        "low_cardio_days",
+        "low_hiking_specific_volume",
+        "low_vertical",
+        "long_hike_not_met"
+      ]
+    },
+    {
+      "week": 9,
+      "start": "2026-09-11",
+      "end": "2026-09-17",
+      "planned": {
+        "cardioDays": 4,
+        "hikeMiles": 11,
+        "verticalFt": 2200,
+        "note": ""
+      },
+      "actual": {
+        "cardioDays": 0,
+        "cardioMinutes": 0,
+        "footMiles": 0,
+        "verticalFt": 0,
+        "stairMinutes": 0,
+        "rideMinutes": 0,
+        "crossTrainingMinutes": 0,
+        "longestFootMiles": 0,
+        "activityCount": 0
+      },
+      "flags": [
+        "low_cardio_days",
+        "low_hiking_specific_volume",
+        "low_vertical",
+        "long_hike_not_met"
+      ]
+    },
+    {
+      "week": 10,
+      "start": "2026-09-18",
+      "end": "2026-09-24",
+      "planned": {
+        "cardioDays": 4,
+        "hikeMiles": 12,
+        "verticalFt": 2800,
+        "note": ""
+      },
+      "actual": {
+        "cardioDays": 0,
+        "cardioMinutes": 0,
+        "footMiles": 0,
+        "verticalFt": 0,
+        "stairMinutes": 0,
+        "rideMinutes": 0,
+        "crossTrainingMinutes": 0,
+        "longestFootMiles": 0,
+        "activityCount": 0
+      },
+      "flags": [
+        "low_cardio_days",
+        "low_hiking_specific_volume",
+        "low_vertical",
+        "long_hike_not_met"
+      ]
+    },
+    {
+      "week": 11,
+      "start": "2026-09-25",
+      "end": "2026-10-01",
+      "planned": {
+        "cardioDays": 4,
+        "hikeMiles": 12,
+        "verticalFt": 2500,
+        "note": ""
+      },
+      "actual": {
+        "cardioDays": 0,
+        "cardioMinutes": 0,
+        "footMiles": 0,
+        "verticalFt": 0,
+        "stairMinutes": 0,
+        "rideMinutes": 0,
+        "crossTrainingMinutes": 0,
+        "longestFootMiles": 0,
+        "activityCount": 0
+      },
+      "flags": [
+        "low_cardio_days",
+        "low_hiking_specific_volume",
+        "low_vertical",
+        "long_hike_not_met"
+      ]
+    },
+    {
+      "week": 12,
+      "start": "2026-10-02",
+      "end": "2026-10-08",
+      "planned": {
+        "cardioDays": 4,
+        "hikeMiles": 8,
+        "verticalFt": 1200,
+        "note": ""
+      },
+      "actual": {
+        "cardioDays": 0,
+        "cardioMinutes": 0,
+        "footMiles": 0,
+        "verticalFt": 0,
+        "stairMinutes": 0,
+        "rideMinutes": 0,
+        "crossTrainingMinutes": 0,
+        "longestFootMiles": 0,
+        "activityCount": 0
+      },
+      "flags": [
+        "low_cardio_days",
+        "low_hiking_specific_volume",
+        "low_vertical",
+        "long_hike_not_met"
+      ]
+    },
+    {
+      "week": 13,
+      "start": "2026-10-09",
+      "end": "2026-10-15",
+      "planned": {
+        "cardioDays": 0,
+        "hikeMiles": 0,
+        "verticalFt": 0,
+        "note": "Trip week"
+      },
+      "actual": {
+        "cardioDays": 0,
+        "cardioMinutes": 0,
+        "footMiles": 0,
+        "verticalFt": 0,
+        "stairMinutes": 0,
+        "rideMinutes": 0,
+        "crossTrainingMinutes": 0,
+        "longestFootMiles": 0,
+        "activityCount": 0
+      },
+      "flags": []
+    }
+  ]
+}

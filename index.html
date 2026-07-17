@@ -52,7 +52,17 @@
   .today-btn { display:block; margin:.8rem auto; background:var(--green); color:white; border:none; padding:.62rem 1.5rem; border-radius:10px; font-size:.9rem; font-weight:700; cursor:pointer; }
   table { width:100%; border-collapse:collapse; font-size:.84rem; margin:.4rem 0; }
   td { border-bottom:1px solid #eee; padding:.35rem .2rem; vertical-align:top; }
-  @media(max-width:500px){ section{padding:.65rem .8rem;} }
+
+  .dashboard { background:white; border-radius:16px; padding:1rem; margin:.8rem 0; box-shadow:0 1px 5px rgba(0,0,0,.08); }
+  .metric-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.5rem; margin:.65rem 0; }
+  .metric { background:#f6f7f5; border-radius:12px; padding:.65rem; }
+  .metric .num { font-size:1.15rem; font-weight:850; color:var(--green); }
+  .metric .lbl { font-size:.72rem; color:var(--muted); text-transform:uppercase; letter-spacing:.35px; }
+  .flag { display:inline-block; background:#fff3cd; color:#7a5200; padding:.2rem .48rem; border-radius:999px; font-size:.74rem; font-weight:700; margin:.12rem; }
+  .done-row { display:flex; align-items:center; gap:.45rem; margin-top:.55rem; font-size:.82rem; color:var(--muted); }
+  .done-row input { width:18px; height:18px; accent-color:var(--green); }
+
+  @media(max-width:500px){ section{padding:.65rem .8rem;} .metric-grid{grid-template-columns:1fr 1fr;} }
 </style>
 </head>
 <body>
@@ -113,7 +123,16 @@ const SB=[
  {n:'Tibialis Raises',s:'3×15–20',c:['Back to wall, lift toes toward shins. Helps descents/shin durability.'],y:'tibialis raise exercise'},
  {n:'Farmer Carry',s:'4×40–60s',c:['Heavy but clean. Tall posture. Grip, trunk, pack posture.'],y:'farmer carry exercise form'},
 ];
-function renderEx(ex){return `<div class="exercise"><h4>${ex.n}</h4><div class="sets">${ex.s||ex.r}</div><ul class="cues">${ex.c.map(x=>`<li>${x}</li>`).join('')}</ul><a class="video-link" href="https://www.youtube.com/results?search_query=${encodeURIComponent(ex.y)}" target="_blank">▶ Demo</a></div>`;}
+function doneKey(date,name){return `done:${date}:${name}`;}
+function isDone(date,name){return localStorage.getItem(doneKey(date,name))==='1';}
+function toggleDone(date,name,el){localStorage.setItem(doneKey(date,name),el.checked?'1':'0');}
+function toggleDoneEncoded(date,encoded,el){toggleDone(date,decodeURIComponent(encoded),el);}
+function renderEx(ex,dateKey=''){
+  if(typeof dateKey!=='string'||!dateKey.includes('-')) dateKey='';
+  const encoded=encodeURIComponent(ex.n);
+  const checkbox=dateKey?`<label class="done-row"><input type="checkbox" ${isDone(dateKey,ex.n)?'checked':''} onchange="toggleDoneEncoded('${dateKey}','${encoded}',this)"> Completed</label>`:'';
+  return `<div class="exercise"><h4>${ex.n}</h4><div class="sets">${ex.s||ex.r}</div><ul class="cues">${ex.c.map(x=>`<li>${x}</li>`).join('')}</ul><a class="video-link" href="https://www.youtube.com/results?search_query=${encodeURIComponent(ex.y)}" target="_blank">▶ Demo</a>${checkbox}</div>`;
+}
 function renderStretch(){return '<h2>🧘 Mobility / Prehab</h2>'+STRETCH.map(renderEx).join('');}
 function typeLabel(t){return {'strength-a':'Strength A','strength-b':'Strength B','aerobic-a':'Zone 2','hill':'Hill/Stairs','long-hike':'Long Hike','recovery':'Recovery','rest':'Rest','taper':'Taper','travel':'Travel/Prep','trip':'R2R Trip'}[t]||t;}
 function dotClass(t){if(t.startsWith('strength'))return'dot-strength'; if(t==='aerobic-a')return'dot-aerobic'; if(t==='hill')return'dot-hill'; if(t==='long-hike')return'dot-hike'; if(t==='taper'||t==='travel')return'dot-taper'; if(t==='trip')return'dot-trip'; return'dot-rest';}
@@ -131,12 +150,33 @@ function countdownText(){
   return 'Hike is underway';
 }
 function header(sub,progress=0){return `<header><h1>⛰️ Rim-to-Rim Training</h1><p class="sub">North Rim → South Rim · 4 days · Oct 15, 2026</p><div style="display:inline-block;margin:.45rem auto .1rem;padding:.32rem .75rem;border-radius:999px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.25);font-weight:800;font-size:.92rem;">${countdownText()}</div>${sub?`<p class="sub">${sub}</p>`:''}<div class="progress-bar"><div class="fill" style="width:${progress}%"></div></div></header>`;}
+
+let STRAVA=null;
+async function loadStrava(){
+  try{ const r=await fetch('data/strava-summary.json?ts='+Date.now()); if(r.ok) STRAVA=await r.json(); }
+  catch(e){ STRAVA={error:true}; }
+}
+function currentTrainingWeek(){
+  const today=new Date(); today.setHours(0,0,0,0);
+  return Math.max(1,Math.min(13,Math.floor((today-parseDate(START))/(7*86400000))+1));
+}
+function flagLabel(f){return {low_cardio_days:'low cardio days',low_hiking_specific_volume:'low hiking-specific volume',low_vertical:'low vertical',long_hike_not_met:'long hike not met'}[f]||f.replaceAll('_',' ');}
+function renderDashboard(){
+  if(!STRAVA) return `<div class="dashboard"><strong>Training dashboard</strong><p class="cues">Loading Strava stats…</p></div>`;
+  if(STRAVA.error) return `<div class="dashboard"><strong>Training dashboard</strong><p class="cues">Strava stats unavailable right now.</p></div>`;
+  const w=currentTrainingWeek();
+  const wk=(STRAVA.weeks||[]).find(x=>x.week===w) || (STRAVA.weeks||[])[0];
+  if(!wk) return '';
+  const a=wk.actual, p=wk.planned;
+  const flags=(wk.flags||[]).map(f=>`<span class="flag">${flagLabel(f)}</span>`).join('') || '<span class="flag" style="background:#e8f5e9;color:var(--green)">on track / no flags</span>';
+  return `<div class="dashboard"><h3>📊 Week ${wk.week} Reality Check</h3><p class="cues">Updated ${new Date(STRAVA.generatedAt).toLocaleString()}</p><div class="metric-grid"><div class="metric"><div class="num">${a.cardioDays}/${p.cardioDays||0}</div><div class="lbl">cardio days</div></div><div class="metric"><div class="num">${a.footMiles}</div><div class="lbl">hike/walk/run miles</div></div><div class="metric"><div class="num">${a.verticalFt}</div><div class="lbl">vertical ft</div></div><div class="metric"><div class="num">${a.stairMinutes}</div><div class="lbl">stair minutes</div></div><div class="metric"><div class="num">${a.rideMinutes}</div><div class="lbl">Peloton/ride min</div></div><div class="metric"><div class="num">${a.longestFootMiles}</div><div class="lbl">longest foot activity</div></div></div><div>${flags}</div><p class="cues" style="margin-top:.45rem">Peloton/rides count for cardio. Stair stepper counts for cardio + vertical-specific training. Outdoor hike/walk/run counts for hiking miles and vertical.</p></div>`;
+}
 function renderDay(k){const day=S[k],d=parseDate(k),w=day.week;const total=Math.round((d-parseDate(START))/86400000);const progress=Math.min(100,Math.max(0,total/90*100));let html=header(`${DAYS[d.getDay()]} ${MONTHS[d.getMonth()]} ${d.getDate()}`,progress)+renderDateStrip(k)+`<div class="info-bar"><span class="info-badge info-week">Week ${w}</span><span class="info-badge info-load">Pack: ${packLoad(w)}</span><span class="info-badge info-type">${typeLabel(day.type)}</span></div><section>`;
 html+=`<div class="card"><strong>Week focus:</strong> ${weekFocus[w]||''}</div>`;
 if(day.type==='rest') html+=`<div class="rest-card"><h2>Rest Day</h2><p>Walk easy if you want. Mobility is enough. Adaptation happens here.</p></div>`;
 if(day.type==='recovery') html+=renderStretch()+`<h2>🚶 Recovery Walk</h2><div class="exercise" style="border-left-color:#2196f3"><h4>30–45 min easy walk</h4><div class="sets">No pack or very light pack</div><ul class="cues"><li>Keep it conversational.</li><li>Purpose: circulation, not fitness testing.</li></ul></div>`;
-if(day.type==='strength-a') html+=renderStretch()+`<h2>🏋️ Strength A — Climb Engine</h2>`+SA.map(renderEx).join('')+`<div class="tip">Keep 1–2 reps in reserve. You are training for the canyon, not proving anything in the gym.</div>`;
-if(day.type==='strength-b') html+=renderStretch()+`<h2>🦵 Strength B — Downhill Armor</h2>`+SB.map(renderEx).join('')+`<div class="tip">The slow lower is the point. If knees complain, reduce step height before abandoning the exercise.</div>`;
+if(day.type==='strength-a') html+=renderStretch()+`<h2>🏋️ Strength A — Climb Engine</h2>`+SA.map(e=>renderEx(e,k)).join('')+`<div class="tip">Keep 1–2 reps in reserve. You are training for the canyon, not proving anything in the gym.</div>`;
+if(day.type==='strength-b') html+=renderStretch()+`<h2>🦵 Strength B — Downhill Armor</h2>`+SB.map(e=>renderEx(e,k)).join('')+`<div class="tip">The slow lower is the point. If knees complain, reduce step height before abandoning the exercise.</div>`;
 if(day.type==='aerobic-a') html+=renderStretch()+`<h2>🚶 Zone 2 Cardio</h2><div class="exercise" style="border-left-color:#2196f3"><h4>${aerobicLen(w)} brisk walk / bike / easy jog</h4><div class="sets">Conversational pace · ${packLoad(w)} if walking after Week 3</div><ul class="cues"><li>Nose-breathing-ish. You should be able to talk.</li><li>Do not turn this into intervals.</li><li>Consistency beats intensity.</li></ul></div>`;
 if(day.type==='hill') html+=renderStretch()+`<h2>🪜 Hill / Stair Session</h2><div class="exercise" style="border-left-color:#ff9800"><h4>${hillLen(w)} controlled climbing</h4><div class="sets">Stairs, hill repeats, or treadmill at 8–15%</div><ul class="cues"><li>Warm up 10 min.</li><li>Climb steady. Walk down carefully.</li><li>Use pack only if joints feel good.</li></ul></div><div class="warn"><strong>No bombing downhill.</strong> The descent training is controlled eccentric strength, not smashing your knees.</div>`;
 if(day.type==='long-hike') html+=renderStretch()+`<h2>🥾 Long Hike</h2><div class="exercise" style="border-left-color:#f44336"><h4>${longHike(w)}</h4><div class="sets">Pack: ${packLoad(w)} · prioritize hills/vertical when possible</div><ul class="cues"><li>Practice poles, shoes, socks, and blister prevention.</li><li>Eat every 30–45 minutes.</li><li>Practice sodium/electrolytes. Don't wait until thirsty.</li><li>Finish feeling like you could keep going.</li></ul></div><div class="tip">Canyon rule: downhill control matters as much as uphill fitness. Short steps, quiet feet, no locked-knee braking.</div>`;
@@ -144,10 +184,10 @@ if(day.type==='taper') html+=`<div class="taper-card"><h2>🧘 Taper</h2><p>${da
 if(day.type==='travel') html+=`<div class="taper-card"><h2>🎒 Travel / Prep</h2><p>${day.detail}</p></div><div class="card"><strong>Checklist:</strong> poles, headlamp, layers, electrolytes, blister kit, sun protection, tested shoes/socks.</div>`;
 if(day.type==='trip') html+=`<div class="trip-card"><h2>🏜️ ${day.detail}</h2><p>Eat early, drink steadily, manage feet immediately, and keep the pace boring.</p></div><div class="card"><strong>Trail mantra:</strong> short steps, quiet feet, steady breathing, snack before you feel flat.</div>`;
 html+='</section>';return html;}
-function renderHome(){const today=dateStr(new Date());let html=header('Interactive daily plan',0)+renderDateStrip(null)+'<section>';if(S[today])html+=`<button class="today-btn" onclick="goTo('${today}')">📍 Today\'s Workout</button>`;html+=`<div class="card"><h3>Trip</h3><table><tr><td><strong>Route</strong></td><td>North Rim → South Rim</td></tr><tr><td><strong>Dates</strong></td><td>Oct 15–18, 2026</td></tr><tr><td><strong>Training block</strong></td><td>Jul 17–Oct 14</td></tr><tr><td><strong>Goal</strong></td><td>Durable legs, controlled descents, steady climbing, pack comfort, foot care.</td></tr></table></div>`;for(let w=1;w<=13;w++){html+=`<h2>Week ${w} <span style="font-weight:400;font-size:.85rem;color:var(--muted)">${packLoad(w)}</span></h2><div class="card"><strong>${weekFocus[w]}</strong></div>`;Object.keys(S).sort().filter(k=>S[k].week===w).forEach(k=>{const d=parseDate(k),day=S[k],isToday=k===today;html+=`<div onclick="goTo('${k}')" style="display:flex;justify-content:space-between;align-items:center;background:${isToday?'#e8f5e9':'white'};border-radius:10px;padding:.55rem .8rem;margin:.25rem 0;box-shadow:0 1px 3px rgba(0,0,0,.05);cursor:pointer;border-left:4px solid ${isToday?'var(--green)':'#ddd'}"><div><strong style="font-size:.88rem">${DAYS[d.getDay()]} ${MONTHS[d.getMonth()]} ${d.getDate()}</strong>${isToday?'<span style="background:var(--green);color:white;padding:.1rem .4rem;border-radius:10px;font-size:.68rem;margin-left:.3rem">TODAY</span>':''}</div><span style="font-size:.82rem;color:var(--muted)">${typeLabel(day.type)}</span></div>`;});}return html+'</section>';}
+function renderHome(){const today=dateStr(new Date());let html=header('Interactive daily plan',0)+renderDateStrip(null)+'<section>';if(S[today])html+=`<button class="today-btn" onclick="goTo('${today}')">📍 Today\'s Workout</button>`;html+=`<div class="card"><h3>Trip</h3><table><tr><td><strong>Route</strong></td><td>North Rim → South Rim</td></tr><tr><td><strong>Dates</strong></td><td>Oct 15–18, 2026</td></tr><tr><td><strong>Training block</strong></td><td>Jul 17–Oct 14</td></tr><tr><td><strong>Goal</strong></td><td>Durable legs, controlled descents, steady climbing, pack comfort, foot care.</td></tr></table></div>`+renderDashboard();for(let w=1;w<=13;w++){html+=`<h2>Week ${w} <span style="font-weight:400;font-size:.85rem;color:var(--muted)">${packLoad(w)}</span></h2><div class="card"><strong>${weekFocus[w]}</strong></div>`;Object.keys(S).sort().filter(k=>S[k].week===w).forEach(k=>{const d=parseDate(k),day=S[k],isToday=k===today;html+=`<div onclick="goTo('${k}')" style="display:flex;justify-content:space-between;align-items:center;background:${isToday?'#e8f5e9':'white'};border-radius:10px;padding:.55rem .8rem;margin:.25rem 0;box-shadow:0 1px 3px rgba(0,0,0,.05);cursor:pointer;border-left:4px solid ${isToday?'var(--green)':'#ddd'}"><div><strong style="font-size:.88rem">${DAYS[d.getDay()]} ${MONTHS[d.getMonth()]} ${d.getDate()}</strong>${isToday?'<span style="background:var(--green);color:white;padding:.1rem .4rem;border-radius:10px;font-size:.68rem;margin-left:.3rem">TODAY</span>':''}</div><span style="font-size:.82rem;color:var(--muted)">${typeLabel(day.type)}</span></div>`;});}return html+'</section>';}
 function goTo(date){history.pushState({date},'',date?`?date=${date}`:'?');render();}
 function render(){const params=new URLSearchParams(window.location.search);const date=params.get('date');document.getElementById('app').innerHTML=date&&S[date]?renderDay(date):renderHome();setTimeout(()=>{const strip=document.getElementById('dateStrip');const active=strip&&strip.querySelector('.active,.today');if(active&&strip)active.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'});},100);}
-window.addEventListener('popstate',render);render();
+window.addEventListener('popstate',render);loadStrava().then(render);
 </script>
 </body>
 </html>
