@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>Rim-to-Rim Training 2026</title>
+<style>
+  :root { --green:#2d6a4f; --dark:#1b4332; --bg:#fafaf8; --card:#fff; --text:#1a1a1a; --muted:#666; --accent:#d4a373; --blue:#1565c0; --red:#c62828; --purple:#7b1fa2; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif; background:var(--bg); color:var(--text); line-height:1.55; padding-bottom:4rem; }
+  header { background:linear-gradient(135deg,var(--green),var(--dark)); color:white; padding:1.15rem 1rem 0.7rem; text-align:center; }
+  header h1 { font-size:1.35rem; margin-bottom:0.1rem; }
+  header .sub { opacity:0.85; font-size:0.85rem; }
+  .progress-bar { height:4px; background:rgba(255,255,255,.22); border-radius:2px; margin:.55rem 1rem 0; overflow:hidden; }
+  .progress-bar .fill { height:100%; background:var(--accent); border-radius:2px; }
+  .date-strip { background:linear-gradient(135deg,#1b4332,#0d2818); padding:.6rem 0 .8rem; overflow:hidden; }
+  .date-strip-inner { display:flex; overflow-x:auto; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch; padding:0 1rem; gap:.4rem; scrollbar-width:none; }
+  .date-strip-inner::-webkit-scrollbar { display:none; }
+  .date-chip { flex-shrink:0; scroll-snap-align:center; width:52px; padding:.4rem .2rem; border-radius:12px; text-align:center; cursor:pointer; transition:all .2s; color:rgba(255,255,255,.62); border:1.5px solid transparent; }
+  .date-chip:hover { background:rgba(255,255,255,.1); }
+  .date-chip.active { background:white; color:var(--green); border-color:white; }
+  .date-chip.today:not(.active) { border-color:var(--accent); color:white; }
+  .date-chip .day-name { font-size:.65rem; text-transform:uppercase; letter-spacing:.5px; }
+  .date-chip .day-num { font-size:1.1rem; font-weight:800; line-height:1.2; }
+  .date-chip .month { font-size:.6rem; opacity:.82; }
+  .workout-dot { width:6px; height:6px; border-radius:50%; margin:2px auto 0; }
+  .dot-strength{background:#4caf50}.dot-aerobic{background:#2196f3}.dot-hill{background:#ff9800}.dot-hike{background:#f44336}.dot-rest{background:rgba(255,255,255,.32)}.dot-taper{background:#9c27b0}.dot-trip{background:#ffd54f}
+  .week-separator { flex-shrink:0; width:1px; background:rgba(255,255,255,.15); margin:.3rem .2rem; align-self:stretch; }
+  .info-bar { display:flex; justify-content:center; gap:.5rem; padding:.55rem 1rem; background:white; border-bottom:1px solid #e8e8e8; flex-wrap:wrap; }
+  .info-badge { display:inline-block; padding:.2rem .6rem; border-radius:12px; font-size:.78rem; font-weight:700; }
+  .info-week{background:var(--accent);color:white}.info-load{background:#e8f5e9;color:var(--green)}.info-type{background:#e3f2fd;color:#1565c0}
+  section { padding:.8rem 1rem; max-width:720px; margin:0 auto; }
+  h2 { color:var(--green); font-size:1.12rem; margin:1.15rem 0 .45rem; padding-bottom:.25rem; border-bottom:2px solid var(--green); }
+  h3 { font-size:1rem; margin:.7rem 0 .3rem; }
+  .exercise { background:var(--card); border-radius:12px; padding:.9rem; margin:.5rem 0; box-shadow:0 1px 4px rgba(0,0,0,.08); border-left:4px solid var(--green); }
+  .exercise h4 { font-size:.96rem; margin-bottom:.15rem; }
+  .sets { color:var(--green); font-weight:700; font-size:.88rem; }
+  .cues { font-size:.85rem; color:var(--muted); margin-top:.25rem; }
+  .cues li { margin:.1rem 0 .1rem 1.2rem; }
+  .video-link { display:inline-flex; align-items:center; gap:.3rem; background:#ff0000; color:white; padding:.2rem .55rem; border-radius:6px; text-decoration:none; font-size:.75rem; font-weight:600; margin-top:.35rem; }
+  .tip { background:#fff3cd; border-radius:8px; padding:.62rem; margin:.55rem 0; font-size:.85rem; }
+  .tip::before { content:'💡 '; }
+  .warn { background:#ffebee; color:#8a1f1f; border-left:4px solid #c62828; border-radius:10px; padding:.7rem; margin:.6rem 0; font-size:.86rem; }
+  .card { background:white; border-radius:14px; padding:1rem; margin:.7rem 0; box-shadow:0 1px 4px rgba(0,0,0,.06); }
+  .rest-card,.taper-card,.trip-card { border-radius:16px; padding:1.6rem; text-align:center; margin:1.3rem 0; }
+  .rest-card { background:linear-gradient(135deg,#e8f5e9,#c8e6c9); }
+  .taper-card { background:linear-gradient(135deg,#e0f2f1,#b2dfdb); }
+  .trip-card { background:linear-gradient(135deg,#fff3e0,#ffe0b2); }
+  .today-btn { display:block; margin:.8rem auto; background:var(--green); color:white; border:none; padding:.62rem 1.5rem; border-radius:10px; font-size:.9rem; font-weight:700; cursor:pointer; }
+  table { width:100%; border-collapse:collapse; font-size:.84rem; margin:.4rem 0; }
+  td { border-bottom:1px solid #eee; padding:.35rem .2rem; vertical-align:top; }
+  @media(max-width:500px){ section{padding:.65rem .8rem;} }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+const DAYS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function dateStr(d){const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),dd=String(d.getDate()).padStart(2,'0');return `${y}-${m}-${dd}`;}
+function addDays(d,n){const r=new Date(d);r.setDate(r.getDate()+n);return r;}
+function parseDate(s){const [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d);}
+
+const START='2026-07-20';
+const TRIP='2026-10-15';
+const S={};
+function add(date,type,extra={}){S[date]={type,...extra};}
+
+const pattern=['strength-a','aerobic-a','rest','strength-b','hill','long-hike','recovery'];
+for(let wk=1;wk<=12;wk++){
+  const start=addDays(parseDate(START),(wk-1)*7);
+  for(let i=0;i<7;i++) add(dateStr(addDays(start,i)),pattern[i],{week:wk});
+}
+add('2026-10-12','taper',{week:13,detail:'30–40 min easy walk + mobility. No workout heroics.'});
+add('2026-10-13','taper',{week:13,detail:'20–30 min easy walk. Final shoe/sock/blister kit check.'});
+add('2026-10-14','travel',{week:13,detail:'Rest, hydrate, pack, early sleep.'});
+add('2026-10-15','trip',{week:13,detail:'Rim-to-Rim Day 1: North Rim start.'});
+add('2026-10-16','trip',{week:13,detail:'Rim-to-Rim Day 2: steady canyon miles.'});
+add('2026-10-17','trip',{week:13,detail:'Rim-to-Rim Day 3: protect feet, eat early, stay ahead of hydration.'});
+add('2026-10-18','trip',{week:13,detail:'Rim-to-Rim Day 4: South Rim climb / finish.'});
+
+const weekFocus={
+1:'Start easy. Build rhythm, no soreness contest.',2:'Add gentle volume and pack familiarity.',3:'First real hiking-leg week.',4:'Consolidate. Let tissues catch up.',5:'Build sustained output.',6:'Add vertical and downhill control.',7:'First back-to-back stimulus.',8:'Recovery/consolidation.',9:'Canyon-specific durability.',10:'Peak vertical week.',11:'Peak back-to-back weekend.',12:'Taper begins: keep sharp, shed fatigue.',13:'Trip week: arrive rested.'
+};
+function packLoad(w){ if(w<=2)return '10–15 lb'; if(w<=4)return '15–20 lb'; if(w<=7)return '20–25 lb'; if(w<=10)return '25–30 lb'; if(w==11)return 'Trip weight'; if(w==12)return 'Moderate/light'; return 'Light only'; }
+function longHike(w){ return ['','4–5 mi easy','5–6 mi','6–7 mi','5–6 mi easy','7–8 mi','8–9 mi + hills','8–10 mi + next-day walk','6–7 mi easy','9–11 mi + descent control','10–12 mi peak vertical','10–12 mi + next day 5–7','6–8 mi fresh'][w]||''; }
+function aerobicLen(w){ if(w<=2)return '30–45 min'; if(w<=4)return '35–45 min'; if(w<=8)return '45–55 min'; if(w<=11)return '50–60 min'; return '35–45 min'; }
+function hillLen(w){ if(w<=2)return '25–35 min'; if(w<=4)return '30–40 min'; if(w<=6)return '40–50 min'; if(w<=9)return '45–60 min'; if(w==10)return '60 min'; if(w==11)return '45 min'; return '30–40 min easy'; }
+
+const STRETCH=[
+ {n:'Calf Stretch',r:'45–60s/side',c:['Heel down, knee straight first, then repeat with knee slightly bent.'],y:'wall calf stretch soleus gastrocnemius'},
+ {n:'Hip Flexor Stretch',r:'45–60s/side',c:['Half-kneel, squeeze back glute, ribs down. Do not arch low back.'],y:'kneeling hip flexor stretch proper form'},
+ {n:'Ankle Rocks',r:'15/side',c:['Knee tracks over toes while heel stays planted. Useful for descents.'],y:'ankle dorsiflexion rocks mobility'},
+ {n:'Glute Bridges',r:'15 reps',c:['Pause one second at top. Wake up glutes before step-ups/lunges.'],y:'glute bridge exercise form'},
+];
+const SA=[
+ {n:'Front Step-ups',s:'3×8–10/leg',c:['Use 12–18 inch step. Drive through whole foot, stand tall, control down.','Wear pack after Week 3.'],y:'weighted step up hiking training'},
+ {n:'Romanian Deadlift',s:'3×8–10',c:['Hinge at hips, soft knees, neutral back. Hamstrings + glutes, not low back.'],y:'romanian deadlift dumbbell form'},
+ {n:'Reverse Lunge',s:'3×8/leg',c:['Step back, descend under control, front knee tracks over toes.'],y:'reverse lunge proper form'},
+ {n:'Single-Leg Calf Raise',s:'3×12–15/leg',c:['Full range. Slow lower. Hold wall lightly if needed.'],y:'single leg calf raise step'},
+ {n:'Front Plank',s:'3×40–60s',c:['Brace like someone is about to poke your stomach. Breathe.'],y:'front plank proper form'},
+];
+const SB=[
+ {n:'Slow Eccentric Step-down',s:'3×8/leg',c:['Three-second lower. Tap heel lightly. This is downhill armor.'],y:'eccentric step down exercise'},
+ {n:'Goblet Squat',s:'3×8–10',c:['Chest tall, knees track over toes, controlled depth.'],y:'goblet squat proper form'},
+ {n:'Single-Leg RDL',s:'3×8/leg',c:['Hinge on one leg, square hips. Build balance for uneven trail.'],y:'single leg romanian deadlift form'},
+ {n:'Tibialis Raises',s:'3×15–20',c:['Back to wall, lift toes toward shins. Helps descents/shin durability.'],y:'tibialis raise exercise'},
+ {n:'Farmer Carry',s:'4×40–60s',c:['Heavy but clean. Tall posture. Grip, trunk, pack posture.'],y:'farmer carry exercise form'},
+];
+function renderEx(ex){return `<div class="exercise"><h4>${ex.n}</h4><div class="sets">${ex.s||ex.r}</div><ul class="cues">${ex.c.map(x=>`<li>${x}</li>`).join('')}</ul><a class="video-link" href="https://www.youtube.com/results?search_query=${encodeURIComponent(ex.y)}" target="_blank">▶ Demo</a></div>`;}
+function renderStretch(){return '<h2>🧘 Mobility / Prehab</h2>'+STRETCH.map(renderEx).join('');}
+function typeLabel(t){return {'strength-a':'Strength A','strength-b':'Strength B','aerobic-a':'Zone 2','hill':'Hill/Stairs','long-hike':'Long Hike','recovery':'Recovery','rest':'Rest','taper':'Taper','travel':'Travel/Prep','trip':'R2R Trip'}[t]||t;}
+function dotClass(t){if(t.startsWith('strength'))return'dot-strength'; if(t==='aerobic-a')return'dot-aerobic'; if(t==='hill')return'dot-hill'; if(t==='long-hike')return'dot-hike'; if(t==='taper'||t==='travel')return'dot-taper'; if(t==='trip')return'dot-trip'; return'dot-rest';}
+function renderDateStrip(active){const today=dateStr(new Date());const dates=Object.keys(S).sort();let html='<div class="date-strip"><div class="date-strip-inner" id="dateStrip">';let last=-1;dates.forEach(k=>{const d=parseDate(k),day=S[k];if(day.week!==last&&last!==-1)html+='<div class="week-separator"></div>';last=day.week;const cls=`date-chip${k===active?' active':''}${k===today&&k!==active?' today':''}`;html+=`<div class="${cls}" onclick="goTo('${k}')"><div class="day-name">${DAYS[d.getDay()]}</div><div class="day-num">${d.getDate()}</div><div class="month">${MONTHS[d.getMonth()]}</div><div class="workout-dot ${dotClass(day.type)}"></div></div>`;});return html+'</div></div>';}
+function header(sub,progress=0){return `<header><h1>⛰️ Rim-to-Rim Training</h1><p class="sub">North Rim → South Rim · 4 days · Oct 15, 2026</p>${sub?`<p class="sub">${sub}</p>`:''}<div class="progress-bar"><div class="fill" style="width:${progress}%"></div></div></header>`;}
+function renderDay(k){const day=S[k],d=parseDate(k),w=day.week;const total=Math.round((d-parseDate(START))/86400000);const progress=Math.min(100,Math.max(0,total/90*100));let html=header(`${DAYS[d.getDay()]} ${MONTHS[d.getMonth()]} ${d.getDate()}`,progress)+renderDateStrip(k)+`<div class="info-bar"><span class="info-badge info-week">Week ${w}</span><span class="info-badge info-load">Pack: ${packLoad(w)}</span><span class="info-badge info-type">${typeLabel(day.type)}</span></div><section>`;
+html+=`<div class="card"><strong>Week focus:</strong> ${weekFocus[w]||''}</div>`;
+if(day.type==='rest') html+=`<div class="rest-card"><h2>Rest Day</h2><p>Walk easy if you want. Mobility is enough. Adaptation happens here.</p></div>`;
+if(day.type==='recovery') html+=renderStretch()+`<h2>🚶 Recovery Walk</h2><div class="exercise" style="border-left-color:#2196f3"><h4>30–45 min easy walk</h4><div class="sets">No pack or very light pack</div><ul class="cues"><li>Keep it conversational.</li><li>Purpose: circulation, not fitness testing.</li></ul></div>`;
+if(day.type==='strength-a') html+=renderStretch()+`<h2>🏋️ Strength A — Climb Engine</h2>`+SA.map(renderEx).join('')+`<div class="tip">Keep 1–2 reps in reserve. You are training for the canyon, not proving anything in the gym.</div>`;
+if(day.type==='strength-b') html+=renderStretch()+`<h2>🦵 Strength B — Downhill Armor</h2>`+SB.map(renderEx).join('')+`<div class="tip">The slow lower is the point. If knees complain, reduce step height before abandoning the exercise.</div>`;
+if(day.type==='aerobic-a') html+=renderStretch()+`<h2>🚶 Zone 2 Cardio</h2><div class="exercise" style="border-left-color:#2196f3"><h4>${aerobicLen(w)} brisk walk / bike / easy jog</h4><div class="sets">Conversational pace · ${packLoad(w)} if walking after Week 3</div><ul class="cues"><li>Nose-breathing-ish. You should be able to talk.</li><li>Do not turn this into intervals.</li><li>Consistency beats intensity.</li></ul></div>`;
+if(day.type==='hill') html+=renderStretch()+`<h2>🪜 Hill / Stair Session</h2><div class="exercise" style="border-left-color:#ff9800"><h4>${hillLen(w)} controlled climbing</h4><div class="sets">Stairs, hill repeats, or treadmill at 8–15%</div><ul class="cues"><li>Warm up 10 min.</li><li>Climb steady. Walk down carefully.</li><li>Use pack only if joints feel good.</li></ul></div><div class="warn"><strong>No bombing downhill.</strong> The descent training is controlled eccentric strength, not smashing your knees.</div>`;
+if(day.type==='long-hike') html+=renderStretch()+`<h2>🥾 Long Hike</h2><div class="exercise" style="border-left-color:#f44336"><h4>${longHike(w)}</h4><div class="sets">Pack: ${packLoad(w)} · prioritize hills/vertical when possible</div><ul class="cues"><li>Practice poles, shoes, socks, and blister prevention.</li><li>Eat every 30–45 minutes.</li><li>Practice sodium/electrolytes. Don't wait until thirsty.</li><li>Finish feeling like you could keep going.</li></ul></div><div class="tip">Canyon rule: downhill control matters as much as uphill fitness. Short steps, quiet feet, no locked-knee braking.</div>`;
+if(day.type==='taper') html+=`<div class="taper-card"><h2>🧘 Taper</h2><p>${day.detail}</p></div><div class="card"><strong>Goal:</strong> shed fatigue. Fitness is already built. Do not add a “confidence workout.”</div>`;
+if(day.type==='travel') html+=`<div class="taper-card"><h2>🎒 Travel / Prep</h2><p>${day.detail}</p></div><div class="card"><strong>Checklist:</strong> poles, headlamp, layers, electrolytes, blister kit, sun protection, tested shoes/socks.</div>`;
+if(day.type==='trip') html+=`<div class="trip-card"><h2>🏜️ ${day.detail}</h2><p>Eat early, drink steadily, manage feet immediately, and keep the pace boring.</p></div><div class="card"><strong>Trail mantra:</strong> short steps, quiet feet, steady breathing, snack before you feel flat.</div>`;
+html+='</section>';return html;}
+function renderHome(){const today=dateStr(new Date());let html=header('Interactive daily plan',0)+renderDateStrip(null)+'<section>';if(S[today])html+=`<button class="today-btn" onclick="goTo('${today}')">📍 Today\'s Workout</button>`;html+=`<div class="card"><h3>Trip</h3><table><tr><td><strong>Route</strong></td><td>North Rim → South Rim</td></tr><tr><td><strong>Dates</strong></td><td>Oct 15–18, 2026</td></tr><tr><td><strong>Training block</strong></td><td>Jul 20–Oct 14</td></tr><tr><td><strong>Goal</strong></td><td>Durable legs, controlled descents, steady climbing, pack comfort, foot care.</td></tr></table></div>`;for(let w=1;w<=13;w++){html+=`<h2>Week ${w} <span style="font-weight:400;font-size:.85rem;color:var(--muted)">${packLoad(w)}</span></h2><div class="card"><strong>${weekFocus[w]}</strong></div>`;Object.keys(S).sort().filter(k=>S[k].week===w).forEach(k=>{const d=parseDate(k),day=S[k],isToday=k===today;html+=`<div onclick="goTo('${k}')" style="display:flex;justify-content:space-between;align-items:center;background:${isToday?'#e8f5e9':'white'};border-radius:10px;padding:.55rem .8rem;margin:.25rem 0;box-shadow:0 1px 3px rgba(0,0,0,.05);cursor:pointer;border-left:4px solid ${isToday?'var(--green)':'#ddd'}"><div><strong style="font-size:.88rem">${DAYS[d.getDay()]} ${MONTHS[d.getMonth()]} ${d.getDate()}</strong>${isToday?'<span style="background:var(--green);color:white;padding:.1rem .4rem;border-radius:10px;font-size:.68rem;margin-left:.3rem">TODAY</span>':''}</div><span style="font-size:.82rem;color:var(--muted)">${typeLabel(day.type)}</span></div>`;});}return html+'</section>';}
+function goTo(date){history.pushState({date},'',date?`?date=${date}`:'?');render();}
+function render(){const params=new URLSearchParams(window.location.search);const date=params.get('date');document.getElementById('app').innerHTML=date&&S[date]?renderDay(date):renderHome();setTimeout(()=>{const strip=document.getElementById('dateStrip');const active=strip&&strip.querySelector('.active,.today');if(active&&strip)active.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'});},100);}
+window.addEventListener('popstate',render);render();
+</script>
+</body>
+</html>
