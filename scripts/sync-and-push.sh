@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 cd "$(dirname "$0")/.."
+export PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:$PATH"
 node scripts/sync-strava.js
 if git diff --quiet -- data/strava-summary.json; then
   echo "No public Strava summary changes to commit."
