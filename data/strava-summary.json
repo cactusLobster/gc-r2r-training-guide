@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-02T21:17:01.844Z",
+  "generatedAt": "2026-08-04T23:17:01.894Z",
   "source": "strava",
   "publicNote": "Sanitized weekly aggregates only. No Strava tokens or GPS routes are published.",
   "trainingStart": "2026-07-17",
@@ -65,18 +65,17 @@
         "note": ""
       },
       "actual": {
-        "cardioDays": 2,
-        "cardioMinutes": 104,
+        "cardioDays": 3,
+        "cardioMinutes": 134,
         "footMiles": 0,
         "verticalFt": 0,
         "stairMinutes": 34,
-        "rideMinutes": 70,
+        "rideMinutes": 100,
         "crossTrainingMinutes": 0,
         "longestFootMiles": 0,
-        "activityCount": 5
+        "activityCount": 6
       },
       "flags": [
-        "low_cardio_days",
         "long_hike_not_met"
       ]
     },
