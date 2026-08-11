@@ -77,6 +77,10 @@
   .meal-row .meal-items { font-size:.86rem; margin:.15rem 0; }
   .meal-row .meal-mac { font-size:.74rem; color:var(--muted); }
   .meal-total { font-size:.78rem; font-weight:700; color:var(--green); border-top:2px solid var(--green); padding-top:.45rem; margin-top:.3rem; }
+  .gro-item { display:flex; gap:.6rem; align-items:flex-start; padding:.32rem 0; font-size:.9rem; cursor:pointer; }
+  .gro-item input { width:18px; height:18px; accent-color:var(--green); margin-top:1px; flex-shrink:0; }
+  .gro-item.checked { opacity:.45; text-decoration:line-through; }
+  .clear-btn { font-size:.72rem; color:var(--muted); background:none; border:1px solid #ddd; border-radius:7px; padding:.3rem .6rem; cursor:pointer; font-family:inherit; margin-bottom:.35rem; }
 
   @media(max-width:500px){ section{padding:.65rem .8rem;} .metric-grid{grid-template-columns:1fr 1fr;} }
 </style>
@@ -168,6 +172,38 @@ const MEALS = {
   ], total:"≈2,300–2,500 kcal — intentional on long-hike days. Do NOT cut it back tomorrow." },
 };
 const MEAL_BY_TYPE = { "strength-a":"A", "aerobic-a":"B", rest:"C", "strength-b":"A", hill:"B", "long-hike":"D", recovery:"C", taper:"C", travel:"C" };
+const GROCERY = [
+  { sec:"Protein — cheapest per gram first", items:[
+    { id:"eggs", n:"Eggs ×18" }, { id:"chick", n:"Chicken — 3 lb (thighs trimmed = cheaper; breast on sale)" },
+    { id:"gturkey", n:"Ground turkey 93/7 — 1.5 lb" }, { id:"tuna", n:"Canned tuna/salmon ×4 (budget lunch swap)" },
+    { id:"yog", n:"Nonfat Greek yogurt — 2 large tubs (store brand)" }, { id:"cott", n:"Cottage cheese low-fat — 1 tub" },
+    { id:"fish", n:"Frozen white fish or shrimp — 1 lb (dinner)" }, { id:"whey", n:"Whey — big tub every ~3 wks" } ] },
+  { sec:"Fiber + carbs — pennies per serving", items:[
+    { id:"oats", n:"Oats — largest canister, store brand" }, { id:"rice", n:"Rice — 5 lb bag" },
+    { id:"lent", n:"Dry lentils — 1 lb bag (≈$1.50, 9g fiber/serv)" }, { id:"pot", n:"Potatoes + 2 sweet potatoes" },
+    { id:"ricecake", n:"Rice cakes — 1 sleeve" }, { id:"chia", n:"Chia seeds (small bag)" } ] },
+  { sec:"Fruit — GERD-safe, budget", items:[
+    { id:"ban", n:"Bananas ×7–10 (budget fruit MVP)" }, { id:"berr", n:"Frozen mixed berries — 2 big bags" },
+    { id:"melon", n:"Cantaloupe or honeydew ×1 (gentle on reflux)" }, { id:"apple", n:"Apples or pears ×4" },
+    { id:"mango", n:"Dried mango + raisins (hike fuel only)" } ] },
+  { sec:"Vegetables — frozen is the budget move", items:[
+    { id:"brocc", n:"Frozen broccoli — 2 big bags" }, { id:"gbeans", n:"Frozen green beans — 1 big bag" },
+    { id:"stirfry", n:"Frozen stir-fry mix — 2 bags" }, { id:"zucc", n:"Zucchini ×3 · carrots 1 bag" },
+    { id:"salad", n:"Salad greens or a cabbage" }, { id:"pepp", n:"Bell peppers ×2" } ] },
+  { sec:"Pantry + trail", items:[
+    { id:"oil", n:"Olive oil + oil spray" }, { id:"alm", n:"Almonds (portion to 15g)" },
+    { id:"soy", n:"Soy sauce · vinegar · honey · cinnamon · herbs" }, { id:"elec", n:"Electrolyte packets" },
+    { id:"pretz", n:"Pretzels + chews (hike fuel)" }, { id:"blister", n:"Blister kit / tape (trip prep)" } ] },
+];
+const PREP = [
+  "Bake 3 lb chicken (or simmer + shred thighs)",
+  "Big pot of rice · big pot of lentils",
+  "Steam/roast 2 trays of vegetables",
+  "Portion 4 lunches + 4 dinners (weigh protein + carbs)",
+  "Brown ground turkey or save for midweek refresh",
+  "Bag snacks: 15g almonds ×5 · Wednesday hike-fuel bag",
+  "Whey + shaker into gym bag · check electrolyte stock",
+];
 function doneKey(date,name){return `done:${date}:${name}`;}
 function isDone(date,name){return localStorage.getItem(doneKey(date,name))==='1';}
 function toggleDone(date,name,el){localStorage.setItem(doneKey(date,name),el.checked?'1':'0');}
@@ -256,11 +292,24 @@ function renderFood(){
   html+=`<div class="card"><div class="eyebrow" style="color:var(--red)">Nutrition calendar</div><p style="font-size:.86rem;margin-top:.25rem">Cut runs through <strong>Oct 8</strong>. From Oct 9 (taper): maintenance ~2,850, extra as carbs. Trip Oct 15–18: eat early and often on trail, no deficit thinking whatsoever in the canyon.</p></div>`;
   return html+'</section>';
 }
-const NAV_TABS=[['plan','⛰️ Plan'],['food','🍳 Food']];
+function groceryData(){try{return JSON.parse(localStorage.getItem('grocery')||'{}');}catch(e){return {};}}
+function saveGrocery(g){localStorage.setItem('grocery',JSON.stringify(g));}
+function toggleGrocery(wk,id,el){const g=groceryData();const w=g[wk]||{};w[id]=!w[id];g[wk]=w;saveGrocery(g);el.closest('label').classList.toggle('checked',!!w[id]);}
+function clearGroceryWeek(wk){const g=groceryData();g[wk]={};saveGrocery(g);render();}
+function renderStore(){
+  const w=currentTrainingWeek();const wk='w'+w;const checked=groceryData()[wk]||{};
+  let html=header('Groceries · budget build',0)+'<section>';
+  html+=`<div style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:.5rem"><div><div class="eyebrow">Week ${w} shop · budget build</div><h2 style="margin:.15rem 0 .2rem;border:none">🛒 Store List</h2></div><button class="clear-btn" onclick="clearGroceryWeek('${wk}')">clear week</button></div>`;
+  html+=`<p class="cues" style="margin:.2rem 0 .4rem">Frozen veg + frozen berries + store brands + dry lentils = same macros, half the price. Buy protein on sale and freeze.</p>`;
+  GROCERY.forEach(s=>{html+=`<div class="card" style="padding:.75rem .9rem"><div class="eyebrow">${s.sec}</div>${s.items.map(it=>`<label class="gro-item${checked[it.id]?' checked':''}"><input type="checkbox" ${checked[it.id]?'checked':''} onchange="toggleGrocery('${wk}','${it.id}',this)"><span>${it.n}</span></label>`).join('')}</div>`;});
+  html+=`<div class="card"><div class="eyebrow">Sunday prep · ~2 hours</div>${PREP.map(p=>`<div style="font-size:.88rem;padding:.2rem 0">▸ ${p}</div>`).join('')}</div>`;
+  return html+'</section>';
+}
+const NAV_TABS=[['plan','⛰️ Plan'],['food','🍳 Food'],['store','🛒 Store']];
 function renderNav(active){return `<nav class="bottom-nav"><div class="nav-inner">${NAV_TABS.map(([k,l])=>`<button class="${k===active?'active':''}" onclick="goTab('${k}')">${l}</button>`).join('')}</div></nav>`;}
 function goTab(t){history.pushState({tab:t},'',t==='plan'?window.location.pathname:`?tab=${t}`);render();}
 function goTo(date){history.pushState({date},'',date?`?date=${date}`:'?');render();}
-function render(){const params=new URLSearchParams(window.location.search);const tab=params.get('tab')||'plan';const date=params.get('date');const view=tab==='food'?renderFood():(date&&S[date]?renderDay(date):renderHome());document.getElementById('app').innerHTML=view+renderNav(tab);if(tab==='plan')setTimeout(()=>{const strip=document.getElementById('dateStrip');const active=strip&&strip.querySelector('.active,.today');if(active&&strip)active.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'});},100);}
+function render(){const params=new URLSearchParams(window.location.search);const tab=params.get('tab')||'plan';const date=params.get('date');const view=tab==='food'?renderFood():tab==='store'?renderStore():(date&&S[date]?renderDay(date):renderHome());document.getElementById('app').innerHTML=view+renderNav(tab);if(tab==='plan')setTimeout(()=>{const strip=document.getElementById('dateStrip');const active=strip&&strip.querySelector('.active,.today');if(active&&strip)active.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'});},100);}
 window.addEventListener('popstate',render);loadStrava().then(render);
 </script>
 </body>
