@@ -62,6 +62,22 @@
   .done-row { display:flex; align-items:center; gap:.45rem; margin-top:.55rem; font-size:.82rem; color:var(--muted); }
   .done-row input { width:18px; height:18px; accent-color:var(--green); }
 
+  .bottom-nav { position:fixed; bottom:0; left:0; right:0; background:white; border-top:1px solid #e0e0e0; display:flex; justify-content:center; z-index:50; padding-bottom:env(safe-area-inset-bottom); }
+  .bottom-nav .nav-inner { display:flex; width:100%; max-width:720px; }
+  .bottom-nav button { flex:1; padding:.6rem 0 .75rem; background:none; border:none; border-top:3px solid transparent; font-size:.82rem; font-weight:700; color:var(--muted); cursor:pointer; font-family:inherit; }
+  .bottom-nav button.active { color:var(--green); border-top-color:var(--green); }
+  .eyebrow { font-size:.72rem; text-transform:uppercase; letter-spacing:.5px; color:var(--muted); font-weight:700; }
+  .meal-tabs { display:flex; gap:.4rem; margin:.55rem 0; }
+  .meal-tabs button { flex:1; padding:.55rem 0; border-radius:8px; border:1px solid #ddd; background:white; font-weight:800; font-size:1rem; cursor:pointer; color:var(--text); font-family:inherit; }
+  .meal-tabs button.active { background:var(--green); color:white; border-color:var(--green); }
+  .meal-row { padding:.55rem 0; }
+  .meal-row + .meal-row { border-top:1px solid #eee; }
+  .meal-row .meal-head { display:flex; justify-content:space-between; align-items:baseline; gap:.5rem; }
+  .meal-row .meal-time { font-size:.75rem; color:var(--blue); font-weight:700; white-space:nowrap; }
+  .meal-row .meal-items { font-size:.86rem; margin:.15rem 0; }
+  .meal-row .meal-mac { font-size:.74rem; color:var(--muted); }
+  .meal-total { font-size:.78rem; font-weight:700; color:var(--green); border-top:2px solid var(--green); padding-top:.45rem; margin-top:.3rem; }
+
   @media(max-width:500px){ section{padding:.65rem .8rem;} .metric-grid{grid-template-columns:1fr 1fr;} }
 </style>
 </head>
@@ -123,6 +139,35 @@ const SB=[
  {n:'Tibialis Raises',s:'3×15–20',c:['Back to wall, lift toes toward shins. Helps descents/shin durability.'],y:'tibialis raise exercise'},
  {n:'Single-Arm KB Farmer Carry',s:'4×40–60s',c:['Use the 35 lb or 50 lb kettlebell, one side at a time. Tall posture.','Grip, trunk, anti-lean strength, pack posture.'],y:'single arm kettlebell farmer carry'},
 ];
+const CUT_END='2026-10-08';
+function isCutting(){const t=new Date();t.setHours(0,0,0,0);return t<=parseDate(CUT_END);}
+const MEALS = {
+  A: { name:"Template A · Standard", rows:[
+    { t:"7:00 AM", m:"Breakfast", items:"3 eggs + 1 cup egg whites · 70g oats (dry) + 1 tbsp chia · 100g frozen berries", mac:"≈640 kcal · 55P / 60C / 21F" },
+    { t:"12:00 PM", m:"Lunch", items:"200g chicken (breast or trimmed thigh) · 180g cooked rice · big frozen-veg stir-fry · 1 tsp oil", mac:"≈610 kcal · 64P / 60C / 12F" },
+    { t:"3:30–4:30 PM", m:"Around workout", items:"1.5 scoops whey · banana · 15g almonds", mac:"≈430 kcal · 41P / 33C / 12F" },
+    { t:"by 6:30 PM", m:"Dinner · GERD-safe", items:"200g baked white fish or turkey breast · 300g steamed green beans/zucchini/carrots · 150g boiled potato · herbs", mac:"≈470 kcal · 56P / 40C / 6F" },
+  ], total:"≈2,150 kcal · 216P / 193C / 51F · ~34g fiber" },
+  B: { name:"Template B · Lentil day (fiber)", rows:[
+    { t:"7:00 AM", m:"Breakfast", items:"300g nonfat Greek yogurt + 1 scoop whey · 60g oats · 100g berries · 1 tbsp chia", mac:"≈640 kcal · 62P / 64C / 14F" },
+    { t:"12:00 PM", m:"Lunch", items:"200g chicken · 200g cooked lentils · big salad · 1 tbsp oil + vinegar", mac:"≈700 kcal · 62P / 48C / 22F" },
+    { t:"3:30–4:30 PM", m:"Around workout", items:"1 scoop whey · 2 rice cakes · 100g cottage cheese", mac:"≈330 kcal · 42P / 22C / 4F" },
+    { t:"by 6:30 PM", m:"Dinner · GERD-safe", items:"200g shrimp or white fish · 300g roasted zucchini/broccoli (oil spray) · 120g rice", mac:"≈450 kcal · 52P / 42C / 7F" },
+  ], total:"≈2,120 kcal · 218P / 176C / 47F · ~34g fiber · lentils stay at lunch, never dinner" },
+  C: { name:"Template C · Ground-meat prep day", rows:[
+    { t:"7:00 AM", m:"Breakfast", items:"Protein oats: 70g oats + 1 scoop whey (stir in off heat) · 1 egg · 100g berries", mac:"≈560 kcal · 42P / 62C / 13F" },
+    { t:"12:00 PM", m:"Lunch", items:"200g cooked 93/7 ground turkey bowl · 180g rice · peppers + 50g corn · ¼ avocado (salsa at lunch only)", mac:"≈720 kcal · 58P / 68C / 22F" },
+    { t:"3:30–4:30 PM", m:"Around workout", items:"300g nonfat Greek yogurt + 1 scoop whey · 1 banana", mac:"≈400 kcal · 55P / 38C / 2F" },
+    { t:"by 6:30 PM", m:"Dinner · GERD-safe", items:"180g roast chicken breast · 300g steamed broccoli + carrots · 130g sweet potato", mac:"≈440 kcal · 52P / 44C / 5F" },
+  ], total:"≈2,120 kcal · 207P / 212C / 42F · ~33g fiber" },
+  D: { name:"Template D · Long-hike Wednesday", rows:[
+    { t:"Pre-hike", m:"Breakfast", items:"70g oats + 1 scoop whey · banana · 1 tbsp honey", mac:"≈600 kcal · 38P / 90C / 9F" },
+    { t:"On the trail", m:"During (2h+)", items:"Eat every 30–45 min: dried mango, pretzels, chews · electrolytes — don't wait until thirsty", mac:"≈300–400 kcal" },
+    { t:"Post-hike", m:"Lunch", items:"1.5 scoops whey · 200g rice · 150g chicken · veg", mac:"≈600 kcal · 70P / 70C / 8F" },
+    { t:"by 6:30 PM", m:"Dinner · GERD-safe", items:"Any dinner from Templates A–C", mac:"≈450 kcal" },
+  ], total:"≈2,300–2,500 kcal — intentional on long-hike days. Do NOT cut it back tomorrow." },
+};
+const MEAL_BY_TYPE = { "strength-a":"A", "aerobic-a":"B", rest:"C", "strength-b":"A", hill:"B", "long-hike":"D", recovery:"C", taper:"C", travel:"C" };
 function doneKey(date,name){return `done:${date}:${name}`;}
 function isDone(date,name){return localStorage.getItem(doneKey(date,name))==='1';}
 function toggleDone(date,name,el){localStorage.setItem(doneKey(date,name),el.checked?'1':'0');}
@@ -185,8 +230,37 @@ if(day.type==='travel') html+=`<div class="taper-card"><h2>🎒 Travel / Prep</h
 if(day.type==='trip') html+=`<div class="trip-card"><h2>🏜️ ${day.detail}</h2><p>Eat early, drink steadily, manage feet immediately, and keep the pace boring.</p></div><div class="card"><strong>Trail mantra:</strong> short steps, quiet feet, steady breathing, snack before you feel flat.</div>`;
 html+='</section>';return html;}
 function renderHome(){const today=dateStr(new Date());let html=header('Interactive daily plan',0)+renderDateStrip(null)+'<section>';if(S[today])html+=`<button class="today-btn" onclick="goTo('${today}')">📍 Today\'s Workout</button>`;html+=`<div class="card"><h3>Trip</h3><table><tr><td><strong>Route</strong></td><td>North Rim → South Rim</td></tr><tr><td><strong>Dates</strong></td><td>Oct 15–18, 2026</td></tr><tr><td><strong>Training block</strong></td><td>Jul 17–Oct 14</td></tr><tr><td><strong>Goal</strong></td><td>Durable legs, controlled descents, steady climbing, pack comfort, foot care.</td></tr></table></div>`+renderDashboard();for(let w=1;w<=13;w++){html+=`<h2>Week ${w} <span style="font-weight:400;font-size:.85rem;color:var(--muted)">${packLoad(w)}</span></h2><div class="card"><strong>${weekFocus[w]}</strong></div>`;Object.keys(S).sort().filter(k=>S[k].week===w).forEach(k=>{const d=parseDate(k),day=S[k],isToday=k===today;html+=`<div onclick="goTo('${k}')" style="display:flex;justify-content:space-between;align-items:center;background:${isToday?'#e8f5e9':'white'};border-radius:10px;padding:.55rem .8rem;margin:.25rem 0;box-shadow:0 1px 3px rgba(0,0,0,.05);cursor:pointer;border-left:4px solid ${isToday?'var(--green)':'#ddd'}"><div><strong style="font-size:.88rem">${DAYS[d.getDay()]} ${MONTHS[d.getMonth()]} ${d.getDate()}</strong>${isToday?'<span style="background:var(--green);color:white;padding:.1rem .4rem;border-radius:10px;font-size:.68rem;margin-left:.3rem">TODAY</span>':''}</div><span style="font-size:.82rem;color:var(--muted)">${typeLabel(day.type)}</span></div>`;});}return html+'</section>';}
+let FOOD_SEL=null;
+function selectMeal(k){FOOD_SEL=k;render();}
+function todayMealKey(){const t=S[dateStr(new Date())];return MEAL_BY_TYPE[t&&t.type]||'C';}
+function mealCard(key){
+  const tmpl=MEALS[key];
+  const maintenance=!isCutting();
+  const rows=tmpl.rows.map(r=>`<div class="meal-row"><div class="meal-head"><strong style="font-size:.9rem">${r.m}</strong><span class="meal-time">${r.t}</span></div><div class="meal-items">${r.items}</div><div class="meal-mac">${r.mac}</div></div>`).join('');
+  const note=maintenance?`<p style="font-size:.82rem;color:var(--red);margin:.2rem 0 .1rem">Add ~150g carbs across breakfast + lunch (bigger rice/oats portions). Glycogen full is the goal now.</p>`:'';
+  return `<div class="card"><div class="eyebrow">${maintenance?'Taper/trip fueling — cut is OVER, eat ~2,850':'Kitchen closes 6:30 PM · light low-fat dinner · bed 9:30'}</div><h3 style="margin:.15rem 0 .2rem">${tmpl.name}</h3>${note}${rows}<div class="meal-total">${tmpl.total}</div></div>`;
+}
+function renderFood(){
+  const cutting=isCutting();
+  const todayKey=todayMealKey();
+  const sel=FOOD_SEL||todayKey;
+  const today=S[dateStr(new Date())];
+  let html=header('Nutrition · daily fuel plan',0)+'<section>';
+  html+=`<div class="eyebrow" style="margin-top:.5rem">${cutting?'2,200 kcal · 225P / 185C / 60F · 35g fiber — through Oct 8':'Maintenance ~2,850 — taper/trip fueling'}</div>`;
+  html+=`<h2 style="margin-top:.15rem">🍳 Meal Templates</h2>`;
+  html+=`<p class="cues" style="margin:.3rem 0 .1rem">By session: Strength days A · Zone 2 + Hill days B · Rest/Recovery C · Long-hike Wednesdays D. Weigh protein + carbs the first 2 weeks.</p>`;
+  html+=`<div class="meal-tabs">${['A','B','C','D'].map(k=>`<button class="${k===sel?'active':''}" onclick="selectMeal('${k}')">${k}</button>`).join('')}</div>`;
+  if(today)html+=`<p class="cues" style="margin:.1rem 0 .3rem">Today is ${typeLabel(today.type)} → Template ${todayKey}${sel===todayKey?' (shown)':''}.</p>`;
+  html+=mealCard(sel);
+  html+=`<div class="card"><div class="eyebrow">GERD rules · evenings</div><p style="font-size:.86rem;margin-top:.25rem">Dinner ≤10–12g fat, done by 6:30. Nothing fried; no tomato sauce, citrus, chocolate, mint, or fizz after mid-afternoon. Salsa and acidic fruit live at lunch. Three clear hours before lying down. Flaring? Shrink dinner to protein + veg and move carbs to breakfast.</p></div>`;
+  html+=`<div class="card"><div class="eyebrow" style="color:var(--red)">Nutrition calendar</div><p style="font-size:.86rem;margin-top:.25rem">Cut runs through <strong>Oct 8</strong>. From Oct 9 (taper): maintenance ~2,850, extra as carbs. Trip Oct 15–18: eat early and often on trail, no deficit thinking whatsoever in the canyon.</p></div>`;
+  return html+'</section>';
+}
+const NAV_TABS=[['plan','⛰️ Plan'],['food','🍳 Food']];
+function renderNav(active){return `<nav class="bottom-nav"><div class="nav-inner">${NAV_TABS.map(([k,l])=>`<button class="${k===active?'active':''}" onclick="goTab('${k}')">${l}</button>`).join('')}</div></nav>`;}
+function goTab(t){history.pushState({tab:t},'',t==='plan'?window.location.pathname:`?tab=${t}`);render();}
 function goTo(date){history.pushState({date},'',date?`?date=${date}`:'?');render();}
-function render(){const params=new URLSearchParams(window.location.search);const date=params.get('date');document.getElementById('app').innerHTML=date&&S[date]?renderDay(date):renderHome();setTimeout(()=>{const strip=document.getElementById('dateStrip');const active=strip&&strip.querySelector('.active,.today');if(active&&strip)active.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'});},100);}
+function render(){const params=new URLSearchParams(window.location.search);const tab=params.get('tab')||'plan';const date=params.get('date');const view=tab==='food'?renderFood():(date&&S[date]?renderDay(date):renderHome());document.getElementById('app').innerHTML=view+renderNav(tab);if(tab==='plan')setTimeout(()=>{const strip=document.getElementById('dateStrip');const active=strip&&strip.querySelector('.active,.today');if(active&&strip)active.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'});},100);}
 window.addEventListener('popstate',render);loadStrava().then(render);
 </script>
 </body>
