@@ -1,0 +1,56 @@
+name: Strava sync
+on:
+  schedule:
+    - cron: '0 12 * * *'   # 05:00 America/Phoenix (UTC-7 year-round, no DST)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: strava-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Build Strava credentials file
+        env:
+          STRAVA_CLIENT_ID: ${{ secrets.STRAVA_CLIENT_ID }}
+          STRAVA_CLIENT_SECRET: ${{ secrets.STRAVA_CLIENT_SECRET }}
+          STRAVA_REFRESH_TOKEN: ${{ secrets.STRAVA_REFRESH_TOKEN }}
+        run: |
+          if [ -z "$STRAVA_CLIENT_ID" ] || [ -z "$STRAVA_CLIENT_SECRET" ] || [ -z "$STRAVA_REFRESH_TOKEN" ]; then
+            echo "::error::Missing Strava secrets. Add STRAVA_CLIENT_ID, STRAVA_CLIENT_SECRET and STRAVA_REFRESH_TOKEN under Settings → Secrets and variables → Actions."
+            exit 1
+          fi
+          jq -n --arg id "$STRAVA_CLIENT_ID" --arg secret "$STRAVA_CLIENT_SECRET" --arg rt "$STRAVA_REFRESH_TOKEN" \
+            '{client_id:$id, client_secret:$secret, refresh_token:$rt}' > "$RUNNER_TEMP/strava-credentials.json"
+      - name: Sync Strava summary
+        env:
+          STRAVA_CREDENTIALS_PATH: ${{ runner.temp }}/strava-credentials.json
+        run: node scripts/sync-strava.js
+      - name: Warn if Strava rotated the refresh token
+        env:
+          STRAVA_REFRESH_TOKEN: ${{ secrets.STRAVA_REFRESH_TOKEN }}
+        run: |
+          NEW=$(jq -r '.refresh_token // empty' "$RUNNER_TEMP/strava-credentials.json")
+          if [ -n "$NEW" ] && [ "$NEW" != "$STRAVA_REFRESH_TOKEN" ]; then
+            echo "::warning::Strava rotated the refresh token. Update the STRAVA_REFRESH_TOKEN repo secret, or future runs will fail."
+          fi
+      - name: Commit and push if changed
+        run: |
+          if git diff --quiet -- data/strava-summary.json; then
+            echo "No public Strava summary changes to commit."
+            exit 0
+          fi
+          git config user.name "strava-sync-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/strava-summary.json
+          git commit -m "Update Strava training stats"
+          git push

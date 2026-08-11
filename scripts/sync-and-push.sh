@@ -9,4 +9,5 @@ if git diff --quiet -- data/strava-summary.json; then
 fi
 git add data/strava-summary.json
 git commit -m "Update Strava training stats"
+git pull --rebase --autostash
 git push
