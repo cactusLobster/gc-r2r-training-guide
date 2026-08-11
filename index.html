@@ -81,6 +81,11 @@
   .gro-item input { width:18px; height:18px; accent-color:var(--green); margin-top:1px; flex-shrink:0; }
   .gro-item.checked { opacity:.45; text-decoration:line-through; }
   .clear-btn { font-size:.72rem; color:var(--muted); background:none; border:1px solid #ddd; border-radius:7px; padding:.3rem .6rem; cursor:pointer; font-family:inherit; margin-bottom:.35rem; }
+  .field-row { display:flex; gap:.5rem; margin-bottom:.55rem; }
+  .field-lbl { font-size:.66rem; text-transform:uppercase; letter-spacing:.4px; color:var(--muted); font-weight:700; margin-bottom:2px; }
+  .field-row input { width:100%; box-sizing:border-box; padding:.5rem .55rem; font-size:16px; border:1px solid #ddd; border-radius:8px; font-family:inherit; }
+  .notes-area { width:100%; box-sizing:border-box; min-height:60px; padding:.5rem .55rem; font-size:16px; border:1px solid #ddd; border-radius:8px; font-family:inherit; resize:vertical; }
+  .save-btn { width:100%; margin-top:.55rem; background:var(--green); color:white; border:none; border-radius:9px; padding:.7rem; font-size:1rem; font-weight:800; cursor:pointer; font-family:inherit; }
 
   @media(max-width:500px){ section{padding:.65rem .8rem;} .metric-grid{grid-template-columns:1fr 1fr;} }
 </style>
@@ -305,11 +310,62 @@ function renderStore(){
   html+=`<div class="card"><div class="eyebrow">Sunday prep · ~2 hours</div>${PREP.map(p=>`<div style="font-size:.88rem;padding:.2rem 0">▸ ${p}</div>`).join('')}</div>`;
   return html+'</section>';
 }
-const NAV_TABS=[['plan','⛰️ Plan'],['food','🍳 Food'],['store','🛒 Store']];
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function checkinData(){try{return JSON.parse(localStorage.getItem('checkins')||'{}');}catch(e){return {};}}
+function saveCheckin(wk){
+  const form={};
+  ['waist','weight','hunger','energy','sleep','notes'].forEach(k=>{form[k]=document.getElementById('ck-'+k).value;});
+  const c=checkinData(); c[wk]=form; localStorage.setItem('checkins',JSON.stringify(c)); render();
+}
+function verdict(checkins) {
+  const weeks = Object.keys(checkins).map(Number).sort((a,b)=>a-b);
+  if (weeks.length < 2) return null;
+  const lastW = weeks[weeks.length-1], prevW = weeks[weeks.length-2];
+  const last = checkins[lastW], prev = checkins[prevW];
+  const perWk = (parseFloat(last.weight) - parseFloat(prev.weight)) / (lastW - prevW);
+  const dWaist = parseFloat(last.waist) - parseFloat(prev.waist);
+  if (lastW >= 11) return "Week 11+: no more calorie cuts regardless of the trend — you're in peak/taper territory. Ride current intake to Oct 8, then maintenance.";
+  if (weeks.length < 3 && lastW <= 5) return "First weeks of the cut include water/glycogen noise — log it, change nothing yet.";
+  if (!isNaN(dWaist) && dWaist < -0.05 && Math.abs(perWk) < 0.4) return "Weight flat but waist shrinking → recomposition. The primary metric is winning. Change nothing.";
+  if (perWk > -0.5 && (isNaN(dWaist) || dWaist > -0.1)) return "Losing under 0.5 lb/wk with waist flat → if adherence was ≥90%, pick ONE: cut 100 kcal from carbs/fat, or add 1,500 daily steps. Hold 2 weeks.";
+  if (perWk < -1.5 && parseFloat(last.hunger) >= 8) return "Losing over 1.5 lb/wk with hunger 8+ → add 100–150 kcal of carbs around training. Protect the muscle and the long hikes.";
+  return "In the -0.75 to -1.25 lb/wk lane → on track. Change nothing, keep stacking weeks.";
+}
+function lineChart(points,color){
+  if(points.length<2)return '';
+  const W=320,H=120,P=24;
+  const ys=points.map(p=>p.y);
+  let min=Math.min(...ys),max=Math.max(...ys);
+  if(max-min<1){const mid=(max+min)/2;min=mid-0.5;max=mid+0.5;}
+  const X=i=>P+i*(W-2*P)/(points.length-1);
+  const Y=v=>H-P-((v-min)/(max-min))*(H-2*P);
+  const path=points.map((p,i)=>`${i?'L':'M'}${X(i).toFixed(1)},${Y(p.y).toFixed(1)}`).join(' ');
+  const dots=points.map((p,i)=>`<circle cx="${X(i).toFixed(1)}" cy="${Y(p.y).toFixed(1)}" r="3.5" fill="${color}"/>`).join('');
+  const labels=points.map((p,i)=>`<text x="${X(i).toFixed(1)}" y="${H-6}" font-size="9" text-anchor="middle" fill="#666">${p.x}</text>`).join('');
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;display:block"><path d="${path}" fill="none" stroke="${color}" stroke-width="2.5"/>${dots}${labels}<text x="2" y="${Y(max)+3}" font-size="9" fill="#666">${max.toFixed(1)}</text><text x="2" y="${Y(min)+3}" font-size="9" fill="#666">${min.toFixed(1)}</text></svg>`;
+}
+function ckField(label,key,ph,form){return `<div style="flex:1"><div class="field-lbl">${label}</div><input id="ck-${key}" inputmode="decimal" placeholder="${ph}" value="${esc(form[key]||'')}"></div>`;}
+function renderTrack(){
+  const wk=currentTrainingWeek();
+  const c=checkinData();
+  const form=c[wk]||{};
+  const v=verdict(c);
+  const weeks=Object.keys(c).map(Number).sort((a,b)=>a-b);
+  const waistPts=weeks.filter(w=>!isNaN(parseFloat(c[w].waist))).map(w=>({x:'W'+w,y:parseFloat(c[w].waist)}));
+  const weightPts=weeks.filter(w=>!isNaN(parseFloat(c[w].weight))).map(w=>({x:'W'+w,y:parseFloat(c[w].weight)}));
+  let html=header('Friday check-in',0)+'<section>';
+  html+=`<div class="eyebrow" style="margin-top:.5rem">Friday · wake, empty, before food</div><h2 style="margin-top:.15rem">📏 Week ${wk} Check-in</h2>`;
+  html+=`<div class="card"><div class="field-row">${ckField('Waist (avg of 3), in','waist','34.5',form)}${ckField('7-day avg weight, lb','weight','192.4',form)}</div><div class="field-row">${ckField('Hunger 1–10','hunger','5',form)}${ckField('Energy 1–10','energy','7',form)}${ckField('Sleep 1–10','sleep','7',form)}</div><textarea id="ck-notes" class="notes-area" placeholder="Notes — lifts, long hike, feet, reflux, how the vest felt…">${esc(form.notes||'')}</textarea><button class="save-btn" onclick="saveCheckin(${wk})">Save week ${wk}</button></div>`;
+  if(v)html+=`<div class="card" style="border-left:4px solid var(--red)"><div class="eyebrow" style="color:var(--red)">The rules say</div><p style="font-size:.9rem;margin-top:.25rem">${v}</p><p class="cues" style="margin-top:.35rem">Never stack adjustments. Never adjust on under 2 weeks of data. Protein and the Wednesday long hike don't flex. Cut ends Oct 8 no matter what.</p></div>`;
+  if(waistPts.length>=2)html+=`<div class="card"><div class="eyebrow">Waist — the metric that matters</div>${lineChart(waistPts,'#c62828')}</div>`;
+  if(weightPts.length>=2)html+=`<div class="card"><div class="eyebrow">Weight trend</div>${lineChart(weightPts,'#2d6a4f')}</div>`;
+  return html+'</section>';
+}
+const NAV_TABS=[['plan','⛰️ Plan'],['food','🍳 Food'],['store','🛒 Store'],['track','📏 Track']];
 function renderNav(active){return `<nav class="bottom-nav"><div class="nav-inner">${NAV_TABS.map(([k,l])=>`<button class="${k===active?'active':''}" onclick="goTab('${k}')">${l}</button>`).join('')}</div></nav>`;}
 function goTab(t){history.pushState({tab:t},'',t==='plan'?window.location.pathname:`?tab=${t}`);render();}
 function goTo(date){history.pushState({date},'',date?`?date=${date}`:'?');render();}
-function render(){const params=new URLSearchParams(window.location.search);const tab=params.get('tab')||'plan';const date=params.get('date');const view=tab==='food'?renderFood():tab==='store'?renderStore():(date&&S[date]?renderDay(date):renderHome());document.getElementById('app').innerHTML=view+renderNav(tab);if(tab==='plan')setTimeout(()=>{const strip=document.getElementById('dateStrip');const active=strip&&strip.querySelector('.active,.today');if(active&&strip)active.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'});},100);}
+function render(){const params=new URLSearchParams(window.location.search);const tab=params.get('tab')||'plan';const date=params.get('date');const view=tab==='food'?renderFood():tab==='store'?renderStore():tab==='track'?renderTrack():(date&&S[date]?renderDay(date):renderHome());document.getElementById('app').innerHTML=view+renderNav(tab);if(tab==='plan')setTimeout(()=>{const strip=document.getElementById('dateStrip');const active=strip&&strip.querySelector('.active,.today');if(active&&strip)active.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'});},100);}
 window.addEventListener('popstate',render);loadStrava().then(render);
 </script>
 </body>
