@@ -47,10 +47,12 @@ function classify(a) {
   const name = String(a.name || '').toLowerCase();
   const trainer = !!a.trainer;
   const isStair = /stair|stepper|stairmaster|climbmill|climb mill|stairs/.test(sport + ' ' + name);
+  const isRower = sport.includes('rowing') || /\browing\b|\brower\b|concept ?2|\berg\b/.test(name);
   const isRide = sport.includes('ride') || sport.includes('virtualride') || trainer;
   const isFoot = ['walk','hike','run','trailrun'].some(x => sport.includes(x));
   const isWorkout = sport.includes('workout') || sport.includes('elliptical');
   if (isStair) return 'stairs';
+  if (isRower) return 'rower';
   if (isFoot) return 'foot';
   if (isRide) return 'ride';
   if (isWorkout) return 'cross_training';
@@ -58,10 +60,15 @@ function classify(a) {
 }
 
 function plannedForWeek(w) {
-  if (w >= 13) return { cardioDays: 0, hikeMiles: 0, verticalFt: 0, note: 'Trip week' };
+  if (w >= 13) return { cardioDays: 0, hikeMiles: 0, verticalFt: 0, cardioMinutes: 0, note: 'Trip week' };
   const hikeMiles = [0,5,6,7,6,8,9,10,7,11,12,12,8][w] || 0;
   const verticalFt = [0,500,700,900,700,1200,1500,1800,900,2200,2800,2500,1200][w] || 0;
-  return { cardioDays: 4, hikeMiles, verticalFt, note: '' };
+  // Midpoints of the program's Zone 2 / hill session ranges, plus a 37-min
+  // recovery walk and the long hike at ~20 min/mi loaded pace.
+  const zone2 = [0,37,37,40,40,50,50,50,50,55,55,55,40][w] || 0;
+  const hill = [0,30,30,35,35,45,45,52,52,52,60,45,35][w] || 0;
+  const cardioMinutes = zone2 + hill + 37 + hikeMiles * 20;
+  return { cardioDays: 4, hikeMiles, verticalFt, cardioMinutes, note: '' };
 }
 
 async function main() {
@@ -83,7 +90,7 @@ async function main() {
     const end = addDays(start, 6);
     weeks.push({
       week: w, start: ymd(start), end: ymd(end), planned: plannedForWeek(w),
-      actual: { cardioDays: 0, cardioMinutes: 0, footMiles: 0, verticalFt: 0, stairMinutes: 0, rideMinutes: 0, crossTrainingMinutes: 0, longestFootMiles: 0, activityCount: 0 },
+      actual: { cardioDays: 0, cardioMinutes: 0, footMiles: 0, footMinutes: 0, verticalFt: 0, stairMinutes: 0, rideMinutes: 0, crossTrainingMinutes: 0, rowerSessions: 0, rowerMinutes: 0, rowerMaxMinutes: 0, longestFootMiles: 0, activityCount: 0 },
       flags: []
     });
   }
@@ -107,6 +114,7 @@ async function main() {
     }
     if (cat === 'foot') {
       wk.actual.footMiles = +(wk.actual.footMiles + distMi).toFixed(2);
+      wk.actual.footMinutes += dur;
       wk.actual.verticalFt += elevFt;
       wk.actual.longestFootMiles = Math.max(wk.actual.longestFootMiles, distMi);
     } else if (cat === 'stairs') {
@@ -115,6 +123,13 @@ async function main() {
       wk.actual.rideMinutes += dur;
     } else if (cat === 'cross_training') {
       wk.actual.crossTrainingMinutes += dur;
+    } else if (cat === 'rower') {
+      // Back guardrail: the rower is a 5-10 min easy warm-up tool only.
+      wk.actual.rowerSessions += 1;
+      wk.actual.rowerMinutes += dur;
+      wk.actual.rowerMaxMinutes = Math.max(wk.actual.rowerMaxMinutes, dur);
+      const hard = (a.average_heartrate && a.average_heartrate >= 140) || (a.suffer_score && a.suffer_score >= 25);
+      if (dur > 12 || hard) wk.rowerGuardrailHit = true;
     }
   }
 
@@ -126,7 +141,10 @@ async function main() {
       if (a.footMiles < p.hikeMiles * 0.6 && a.stairMinutes < 30) wk.flags.push('low_hiking_specific_volume');
       if (a.verticalFt < p.verticalFt * 0.5 && a.stairMinutes < 30) wk.flags.push('low_vertical');
       if (a.longestFootMiles < Math.max(4, p.hikeMiles * 0.7) && wk.week >= 3) wk.flags.push('long_hike_not_met');
+      if (a.rideMinutes > a.footMinutes + a.stairMinutes && a.cardioMinutes >= 90) wk.flags.push('bike_dominant');
     }
+    if (wk.rowerGuardrailHit) wk.flags.push('rower_guardrail');
+    delete wk.rowerGuardrailHit;
   }
 
   const out = {

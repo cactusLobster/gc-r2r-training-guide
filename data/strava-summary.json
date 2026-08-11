@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-10T03:17:02.128Z",
+  "generatedAt": "2026-08-11T00:58:06.967Z",
   "source": "strava",
   "publicNote": "Sanitized weekly aggregates only. No Strava tokens or GPS routes are published.",
   "trainingStart": "2026-07-17",
@@ -13,22 +13,28 @@
         "cardioDays": 4,
         "hikeMiles": 5,
         "verticalFt": 500,
+        "cardioMinutes": 204,
         "note": ""
       },
       "actual": {
         "cardioDays": 4,
         "cardioMinutes": 152,
         "footMiles": 0,
+        "footMinutes": 0,
         "verticalFt": 0,
         "stairMinutes": 0,
         "rideMinutes": 152,
         "crossTrainingMinutes": 0,
+        "rowerSessions": 0,
+        "rowerMinutes": 0,
+        "rowerMaxMinutes": 0,
         "longestFootMiles": 0,
         "activityCount": 6
       },
       "flags": [
         "low_hiking_specific_volume",
-        "low_vertical"
+        "low_vertical",
+        "bike_dominant"
       ]
     },
     {
@@ -39,20 +45,27 @@
         "cardioDays": 4,
         "hikeMiles": 6,
         "verticalFt": 700,
+        "cardioMinutes": 224,
         "note": ""
       },
       "actual": {
         "cardioDays": 3,
-        "cardioMinutes": 168,
+        "cardioMinutes": 158,
         "footMiles": 0,
+        "footMinutes": 0,
         "verticalFt": 0,
         "stairMinutes": 49,
-        "rideMinutes": 119,
+        "rideMinutes": 109,
         "crossTrainingMinutes": 0,
+        "rowerSessions": 1,
+        "rowerMinutes": 10,
+        "rowerMaxMinutes": 10,
         "longestFootMiles": 0,
         "activityCount": 6
       },
-      "flags": []
+      "flags": [
+        "bike_dominant"
+      ]
     },
     {
       "week": 3,
@@ -62,21 +75,27 @@
         "cardioDays": 4,
         "hikeMiles": 7,
         "verticalFt": 900,
+        "cardioMinutes": 252,
         "note": ""
       },
       "actual": {
         "cardioDays": 3,
-        "cardioMinutes": 134,
+        "cardioMinutes": 123,
         "footMiles": 0,
+        "footMinutes": 0,
         "verticalFt": 0,
         "stairMinutes": 34,
-        "rideMinutes": 100,
+        "rideMinutes": 89,
         "crossTrainingMinutes": 0,
+        "rowerSessions": 1,
+        "rowerMinutes": 11,
+        "rowerMaxMinutes": 11,
         "longestFootMiles": 0,
         "activityCount": 6
       },
       "flags": [
-        "long_hike_not_met"
+        "long_hike_not_met",
+        "bike_dominant"
       ]
     },
     {
@@ -87,16 +106,21 @@
         "cardioDays": 4,
         "hikeMiles": 6,
         "verticalFt": 700,
+        "cardioMinutes": 232,
         "note": ""
       },
       "actual": {
         "cardioDays": 2,
-        "cardioMinutes": 100,
+        "cardioMinutes": 71,
         "footMiles": 0,
+        "footMinutes": 0,
         "verticalFt": 0,
         "stairMinutes": 10,
-        "rideMinutes": 90,
+        "rideMinutes": 61,
         "crossTrainingMinutes": 0,
+        "rowerSessions": 1,
+        "rowerMinutes": 29,
+        "rowerMaxMinutes": 29,
         "longestFootMiles": 0,
         "activityCount": 4
       },
@@ -104,7 +128,8 @@
         "low_cardio_days",
         "low_hiking_specific_volume",
         "low_vertical",
-        "long_hike_not_met"
+        "long_hike_not_met",
+        "rower_guardrail"
       ]
     },
     {
@@ -115,16 +140,21 @@
         "cardioDays": 4,
         "hikeMiles": 8,
         "verticalFt": 1200,
+        "cardioMinutes": 292,
         "note": ""
       },
       "actual": {
         "cardioDays": 0,
         "cardioMinutes": 0,
         "footMiles": 0,
+        "footMinutes": 0,
         "verticalFt": 0,
         "stairMinutes": 0,
         "rideMinutes": 0,
         "crossTrainingMinutes": 0,
+        "rowerSessions": 0,
+        "rowerMinutes": 0,
+        "rowerMaxMinutes": 0,
         "longestFootMiles": 0,
         "activityCount": 0
       },
@@ -143,16 +173,21 @@
         "cardioDays": 4,
         "hikeMiles": 9,
         "verticalFt": 1500,
+        "cardioMinutes": 312,
         "note": ""
       },
       "actual": {
         "cardioDays": 0,
         "cardioMinutes": 0,
         "footMiles": 0,
+        "footMinutes": 0,
         "verticalFt": 0,
         "stairMinutes": 0,
         "rideMinutes": 0,
         "crossTrainingMinutes": 0,
+        "rowerSessions": 0,
+        "rowerMinutes": 0,
+        "rowerMaxMinutes": 0,
         "longestFootMiles": 0,
         "activityCount": 0
       },
@@ -171,16 +206,21 @@
         "cardioDays": 4,
         "hikeMiles": 10,
         "verticalFt": 1800,
+        "cardioMinutes": 339,
         "note": ""
       },
       "actual": {
         "cardioDays": 0,
         "cardioMinutes": 0,
         "footMiles": 0,
+        "footMinutes": 0,
         "verticalFt": 0,
         "stairMinutes": 0,
         "rideMinutes": 0,
         "crossTrainingMinutes": 0,
+        "rowerSessions": 0,
+        "rowerMinutes": 0,
+        "rowerMaxMinutes": 0,
         "longestFootMiles": 0,
         "activityCount": 0
       },
@@ -199,16 +239,21 @@
         "cardioDays": 4,
         "hikeMiles": 7,
         "verticalFt": 900,
+        "cardioMinutes": 279,
         "note": ""
       },
       "actual": {
         "cardioDays": 0,
         "cardioMinutes": 0,
         "footMiles": 0,
+        "footMinutes": 0,
         "verticalFt": 0,
         "stairMinutes": 0,
         "rideMinutes": 0,
         "crossTrainingMinutes": 0,
+        "rowerSessions": 0,
+        "rowerMinutes": 0,
+        "rowerMaxMinutes": 0,
         "longestFootMiles": 0,
         "activityCount": 0
       },
@@ -227,16 +272,21 @@
         "cardioDays": 4,
         "hikeMiles": 11,
         "verticalFt": 2200,
+        "cardioMinutes": 364,
         "note": ""
       },
       "actual": {
         "cardioDays": 0,
         "cardioMinutes": 0,
         "footMiles": 0,
+        "footMinutes": 0,
         "verticalFt": 0,
         "stairMinutes": 0,
         "rideMinutes": 0,
         "crossTrainingMinutes": 0,
+        "rowerSessions": 0,
+        "rowerMinutes": 0,
+        "rowerMaxMinutes": 0,
         "longestFootMiles": 0,
         "activityCount": 0
       },
@@ -255,16 +305,21 @@
         "cardioDays": 4,
         "hikeMiles": 12,
         "verticalFt": 2800,
+        "cardioMinutes": 392,
         "note": ""
       },
       "actual": {
         "cardioDays": 0,
         "cardioMinutes": 0,
         "footMiles": 0,
+        "footMinutes": 0,
         "verticalFt": 0,
         "stairMinutes": 0,
         "rideMinutes": 0,
         "crossTrainingMinutes": 0,
+        "rowerSessions": 0,
+        "rowerMinutes": 0,
+        "rowerMaxMinutes": 0,
         "longestFootMiles": 0,
         "activityCount": 0
       },
@@ -283,16 +338,21 @@
         "cardioDays": 4,
         "hikeMiles": 12,
         "verticalFt": 2500,
+        "cardioMinutes": 377,
         "note": ""
       },
       "actual": {
         "cardioDays": 0,
         "cardioMinutes": 0,
         "footMiles": 0,
+        "footMinutes": 0,
         "verticalFt": 0,
         "stairMinutes": 0,
         "rideMinutes": 0,
         "crossTrainingMinutes": 0,
+        "rowerSessions": 0,
+        "rowerMinutes": 0,
+        "rowerMaxMinutes": 0,
         "longestFootMiles": 0,
         "activityCount": 0
       },
@@ -311,16 +371,21 @@
         "cardioDays": 4,
         "hikeMiles": 8,
         "verticalFt": 1200,
+        "cardioMinutes": 272,
         "note": ""
       },
       "actual": {
         "cardioDays": 0,
         "cardioMinutes": 0,
         "footMiles": 0,
+        "footMinutes": 0,
         "verticalFt": 0,
         "stairMinutes": 0,
         "rideMinutes": 0,
         "crossTrainingMinutes": 0,
+        "rowerSessions": 0,
+        "rowerMinutes": 0,
+        "rowerMaxMinutes": 0,
         "longestFootMiles": 0,
         "activityCount": 0
       },
@@ -339,16 +404,21 @@
         "cardioDays": 0,
         "hikeMiles": 0,
         "verticalFt": 0,
+        "cardioMinutes": 0,
         "note": "Trip week"
       },
       "actual": {
         "cardioDays": 0,
         "cardioMinutes": 0,
         "footMiles": 0,
+        "footMinutes": 0,
         "verticalFt": 0,
         "stairMinutes": 0,
         "rideMinutes": 0,
         "crossTrainingMinutes": 0,
+        "rowerSessions": 0,
+        "rowerMinutes": 0,
+        "rowerMaxMinutes": 0,
         "longestFootMiles": 0,
         "activityCount": 0
       },
